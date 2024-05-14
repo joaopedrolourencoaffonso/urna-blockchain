@@ -65,10 +65,39 @@ contract Voting is Ownable {
     }
 
     function cadastrarVotacao(string memory nomeDaVotacao, string memory status) external onlyOwner {
+        require(!paused, "Contrato pausado.");
+        require(bytes(votacoes[nomeDaVotacao]).length == 0, "Votacao ja existe");
         votacoes[nomeDaVotacao] = status;
+        votos[nomeDaVotacao].push(0);
+        votos[nomeDaVotacao].push(0);
     }
 
     function statusDeVotacao(string memory nomeDaVotacao) public view returns (string memory) {
+        require(!paused, "Contrato pausado.");
         return votacoes[nomeDaVotacao];
+    }
+
+    function votosAtual(string memory nomeDaVotacao) public view returns (uint256[2] memory) {
+        require(!paused, "Contrato pausado.");
+        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe");
+        require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
+
+        uint256[2] memory resultado_votacao = [votos[nomeDaVotacao][0], votos[nomeDaVotacao][1]];
+
+        return resultado_votacao;
+    }
+
+    function votar(string memory nomeDaVotacao, uint256 voto) public {
+        require(!paused, "Contrato pausado.");
+        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe");
+        require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
+        require(voto == 1 || voto == 0, "Voto invalido.");
+        
+        //0 para NÃO e 1 para SIM
+        if (voto == 0) {
+            votos[nomeDaVotacao][0] += 1;
+        } else if (voto == 1) {
+            votos[nomeDaVotacao][1] += 1;
+        }     
     }
 }

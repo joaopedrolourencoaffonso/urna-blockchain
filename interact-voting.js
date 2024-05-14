@@ -1,7 +1,7 @@
 const hre = require("hardhat");
 
 // 7 eleitores
-lista_de_eleitores = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+lista_de_eleitores_old = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 "0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
 "0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
 "0x90F79bf6EB2c4f870365E785982E1f101E93b906",
@@ -12,6 +12,9 @@ lista_de_eleitores = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
 
 async function main() {
   try {
+    const lista_de_eleitores = await ethers.getSigners();
+    const [conta1, conta2, conta3, conta4, conta5] = await ethers.getSigners();
+    const lista_de_eleitores_que_vao_votar = [conta1, conta2, conta3, conta4, conta5];
     const Contrato = await ethers.getContractFactory("Voting");
     const contrato = await Contrato.deploy("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266");
 
@@ -35,7 +38,7 @@ async function main() {
     let eleitores = await contrato.retornaEleitores();
     console.log("Lista de eleitores: ", eleitores);
 
-    approveTx = await contrato.excluiEleitor(lista_de_eleitores[3]);
+    approveTx = await contrato.excluiEleitor(lista_de_eleitores[15]);
     approveTx.wait();
 
     console.log("-----");
@@ -53,6 +56,14 @@ async function main() {
 
     saida = await contrato.statusDeVotacao("Plutão é um planeta?");
     console.log("O status da votação é: ", saida);
+
+    for (let eleitor of lista_de_eleitores_que_vao_votar) {
+        approveTx = await contrato.connect(eleitor).votar("Plutão é um planeta?", 0);
+        approveTx.wait();
+    }
+
+    saida = await contrato.votosAtual("Plutão é um planeta?");
+    console.log("O número de votos como 'NÃO' é: ", saida[0], " c omo 'SIM' é: ", saida[1]);
 
   } catch (error) {
     console.error(error);

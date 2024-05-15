@@ -66,7 +66,7 @@ contract Voting is Ownable {
         if (eleitores.length == 0) {
             return false;
         }
-        for (uint256 i = 0; i < eleitores.length - 1; i++) {
+        for (uint256 i = 0; i <= eleitores.length - 1; i++) {
             if (eleitores[i] == eleitor) {
                 return true;
             }

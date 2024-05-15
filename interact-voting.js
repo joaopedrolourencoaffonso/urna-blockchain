@@ -51,7 +51,7 @@ async function main() {
     saida = await contrato.cadastrarVotacao("Devemos investir no FKXT11?","Em Andamento","Os imóveis do fundo são bem localizados e eles acabaram de resolver uma disputa legal. Acho que é uma boa oportunidade.");
 
     saida = await contrato.statusDeVotacao("Plutão é um planeta?");
-    console.log("O status da votação é: ", saida);
+    console.log("O status da votação 'Plutão é um planeta?' é: '", saida,"'.");
 
     for (let eleitor of cinco_eleitores) {
         approveTx = await contrato.connect(eleitor).votar("Plutão é um planeta?", 0);
@@ -69,6 +69,8 @@ async function main() {
     console.log("Status da votação 'Plutão é um planeta?' -> ",await contrato.statusDeVotacao("Plutão é um planeta?"), );
 
     console.log(await contrato.retornaVotacoes());
+
+    console.log("Eleitores que votaram em 'Plutão é um planeta?'\n", await contrato.quemJaVotou('Plutão é um planeta?'))
 
   } catch (error) {
     console.error(error);

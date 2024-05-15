@@ -7,7 +7,8 @@ Um pequeno projeto para praticar conhecimentos em solidity.
 1. Crie um projeto Hardhat normalmente
 2. Salve o [`voting.sol`](./voting.sol) na sua pasta `contracts`.
 3. Salve o [`interact-voting.js`](./interact-voting.js) na sua pasta `scripts`.
-4. Execute: `npx hardhat run .\scripts\interact-voting.js`, o resultado deveria ser similar ao abaixo:
+4. Salve o [`test-voting.js`](./test-voting.js) na sua pasta `test`.
+5. Para visualizar um exemplo de interação com o contrato use: `npx hardhat run .\scripts\interact-voting.js`, o resultado deveria ser similar ao abaixo:
 
 ```bash
 > npx hardhat run .\scripts\interact-voting.js

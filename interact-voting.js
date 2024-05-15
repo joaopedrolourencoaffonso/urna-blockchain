@@ -1,20 +1,12 @@
-const hre = require("hardhat");
+//Esse script é mais um passo a passo de como interagir com o contrato pela linha de comando que qualquer outra coisa
 
-// 7 eleitores
-lista_de_eleitores_old = ["0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
-"0x70997970C51812dc3A010C7d01b50e0d17dc79C8",
-"0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC",
-"0x90F79bf6EB2c4f870365E785982E1f101E93b906",
-"0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65",
-"0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc",
-"0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199"
-];
+const hre = require("hardhat");
 
 async function main() {
   try {
     const lista_de_eleitores = await ethers.getSigners();
-    const [conta1, conta2, conta3, conta4, conta5] = await ethers.getSigners();
-    const lista_de_eleitores_que_vao_votar = [conta1, conta2, conta3, conta4, conta5];
+    const cinco_eleitores = lista_de_eleitores.slice(0,4);
+    const outros_eleitores = lista_de_eleitores.slice(5,12);
     const Contrato = await ethers.getContractFactory("Voting");
     const contrato = await Contrato.deploy("0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266");
 
@@ -34,11 +26,13 @@ async function main() {
         approveTx = await contrato.adicionaEleitor(eleitor);
         approveTx.wait();
     }
-    // Retrieve the updated message
+    //
+    console.log("Contrato está pausado? -> ", await contrato.paused());
+
     let eleitores = await contrato.retornaEleitores();
     console.log("Lista de eleitores: ", eleitores);
 
-    approveTx = await contrato.excluiEleitor(lista_de_eleitores[15]);
+    approveTx = await contrato.excluiEleitor(lista_de_eleitores[19]);
     approveTx.wait();
 
     console.log("-----");
@@ -47,23 +41,34 @@ async function main() {
     console.log("Lista de eleitores: ", eleitores);
 
     let saida = await contrato.isEleitor(lista_de_eleitores[0]);
-    console.log("O endereço ", lista_de_eleitores[0], ": ", saida);
+    console.log("O endereço ", lista_de_eleitores[0].address, " é um eleitor cadastrado? -> ", saida);
 
     saida = await contrato.numeroDeEleitores();
     console.log("O número atual de eleitores é: ", saida);
 
-    saida = await contrato.cadastrarVotacao("Plutão é um planeta?","Em Andamento");
+    saida = await contrato.cadastrarVotacao("Plutão é um planeta?","Em Andamento","Eu adoro planetas e queria ter mais um.");
+    saida = await contrato.cadastrarVotacao("Tomate é uma fruta?","Em Andamento","Eu não acho que tomate seja uma fruta e você?");
+    saida = await contrato.cadastrarVotacao("Devemos investir no FKXT11?","Em Andamento","Os imóveis do fundo são bem localizados e eles acabaram de resolver uma disputa legal. Acho que é uma boa oportunidade.");
 
     saida = await contrato.statusDeVotacao("Plutão é um planeta?");
     console.log("O status da votação é: ", saida);
 
-    for (let eleitor of lista_de_eleitores_que_vao_votar) {
+    for (let eleitor of cinco_eleitores) {
         approveTx = await contrato.connect(eleitor).votar("Plutão é um planeta?", 0);
         approveTx.wait();
     }
 
     saida = await contrato.votosAtual("Plutão é um planeta?");
-    console.log("O número de votos como 'NÃO' é: ", saida[0], " c omo 'SIM' é: ", saida[1]);
+    console.log("O número de votos como 'NÃO' é: ", saida[0], " como 'SIM' é: ", saida[1]);
+
+    for (let eleitor of outros_eleitores) {
+      approveTx = await contrato.connect(eleitor).votar("Plutão é um planeta?", 0);
+      approveTx.wait();
+    }
+    //saida = await contrato.statusDeVotacao("Plutão é um planeta?");
+    console.log("Status da votação 'Plutão é um planeta?' -> ",await contrato.statusDeVotacao("Plutão é um planeta?"), );
+
+    console.log(await contrato.retornaVotacoes());
 
   } catch (error) {
     console.error(error);

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/math/Math.sol";
 import "hardhat/console.sol";
 
-contract Voting is Ownable {
+contract SimNaoVotos is Ownable {
     constructor(address initialOwner)
         Ownable(initialOwner)
     {}
@@ -131,9 +131,8 @@ contract Voting is Ownable {
         require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
         require(!isVotoRepetido(nomeDaVotacao, msg.sender), "Eleitor ja votou.");
         require(voto == 1 || voto == 0, "Voto invalido.");
-        require(votacoes[nomeDaVotacao] != "1", votacoes[nomeDaVotacao]);
-        require(votacoes[nomeDaVotacao] != "0", votacoes[nomeDaVotacao]);
-        
+        require(keccak256(bytes(votacoes[nomeDaVotacao])) != keccak256(bytes("0")), "Votacao encerrada, usa a funcao 'votosAtual' para checar o resultado");
+
         //0 para NÃO e 1 para SIM
         if (voto == 0) {
             votos[nomeDaVotacao][0] += 1;
@@ -141,12 +140,12 @@ contract Voting is Ownable {
             votos[nomeDaVotacao][1] += 1;
         }
 
-        if (2 * votos[nomeDaVotacao][0] >= eleitores.length ) {
+        if (2 * votos[nomeDaVotacao][0] > eleitores.length ) {
             emit fimDeVotacao(nomeDaVotacao, "Nao");
-            votacoes[nomeDaVotacao] = "Votacao encerrada, resultado: 'Nao'";
-        } else if (2 * votos[nomeDaVotacao][1] >= eleitores.length ) {
+            votacoes[nomeDaVotacao] = "0";
+        } else if (2 * votos[nomeDaVotacao][1] > eleitores.length ) {
             emit fimDeVotacao(nomeDaVotacao, "Sim");
-            votacoes[nomeDaVotacao] = "Votacao encerrada, resultado: 'Sim'";
+            votacoes[nomeDaVotacao] = "0";
         }
 
         jaVotou[nomeDaVotacao].push(msg.sender); 

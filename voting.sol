@@ -34,14 +34,22 @@ contract SimNaoVotos is Ownable {
         return isPaused;
     }
 
-    function adicionaEleitor(address eleitor) external onlyOwner {
+    modifier notPaused {
         require(!isPaused, "Contrato pausado.");
+        _;
+    }
+
+    modifier votacaoNaoExiste(string calldata nomeDaVotacao) {
+        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
+        _;
+    }
+
+    function adicionaEleitor(address eleitor) notPaused external onlyOwner {
         require(!isEleitor(eleitor), "Eleitor ja cadastrado.");
         eleitores.push(eleitor);
     }
 
-    function excluiEleitor(address eleitor) external onlyOwner {
-        require(!isPaused, "Contrato pausado.");
+    function excluiEleitor(address eleitor) notPaused external onlyOwner {
         require(isEleitor(eleitor), "Eleitor nao cadastrado.");
         
         for (uint256 i = 0; i < eleitores.length - 1; i++) {
@@ -53,18 +61,15 @@ contract SimNaoVotos is Ownable {
         eleitores.pop();
     }
 
-    function retornaEleitores() public view returns (address[] memory) {
-        require(!isPaused, "Contrato pausado.");
+    function retornaEleitores() notPaused public view returns (address[] memory) {
         return eleitores;
     }
 
-    function numeroDeEleitores() public view returns (uint256) {
-        require(!isPaused, "Contrato pausado.");
+    function numeroDeEleitores() notPaused public view returns (uint256) {
         return eleitores.length;
     }
 
-    function isEleitor(address eleitor) public view returns (bool) {
-        require(!isPaused, "Contrato pausado.");
+    function isEleitor(address eleitor) notPaused public view returns (bool) {
         if (eleitores.length == 0) {
             return false;
         }
@@ -76,8 +81,7 @@ contract SimNaoVotos is Ownable {
         return false;
     }
 
-    function cadastrarVotacao(string memory nomeDaVotacao, string memory status, string memory detalhes) external onlyOwner {
-        require(!isPaused, "Contrato pausado.");
+    function cadastrarVotacao(string calldata nomeDaVotacao, string calldata status, string calldata detalhes) notPaused external onlyOwner {
         require(bytes(votacoes[nomeDaVotacao]).length == 0, "Votacao ja existe");
         require(bytes(status).length != 0, "Status nao pode ser vazio");
         
@@ -88,34 +92,23 @@ contract SimNaoVotos is Ownable {
         votos[nomeDaVotacao] = [0,0];
     }
 
-    function editaStatusDeVotacao (string memory nomeDaVotacao, string memory status) external onlyOwner {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
+    function editaStatusDeVotacao (string calldata nomeDaVotacao, string calldata status) notPaused votacaoNaoExiste(nomeDaVotacao) external onlyOwner {
         votacoes[nomeDaVotacao] = status;
     }
 
-    function editaDetalhesDeVotacao (string memory nomeDaVotacao, string memory detalhes) external onlyOwner {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
+    function editaDetalhesDeVotacao (string calldata nomeDaVotacao, string calldata detalhes) notPaused votacaoNaoExiste(nomeDaVotacao) external onlyOwner {
         listaDeVotacoes[nomeDaVotacao] = detalhes;
     }
 
-    function statusDeVotacao(string memory nomeDaVotacao) public view returns (string memory) {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
-        
+    function statusDeVotacao(string calldata nomeDaVotacao) notPaused votacaoNaoExiste(nomeDaVotacao) public view returns (string memory) {
         return votacoes[nomeDaVotacao];
     }
 
-    function detalhesDeVotacao(string memory nomeDaVotacao) public view returns (string memory) {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
-        
+    function detalhesDeVotacao(string calldata nomeDaVotacao) notPaused votacaoNaoExiste(nomeDaVotacao) public view returns (string memory) {
         return listaDeVotacoes[nomeDaVotacao];
     }
 
-    function retornaVotacoes() public view returns (string memory) {
-        require(!isPaused, "Contrato pausado.");
+    function retornaVotacoes() notPaused public view returns (string memory) {
         string memory stringListaDeVotacoes = "";
 
         for (uint256 i = 0; i <= listaDeNomesDeVotacoes.length - 1; i++) {
@@ -125,9 +118,7 @@ contract SimNaoVotos is Ownable {
         return stringListaDeVotacoes;
     }
     
-    function votar(string memory nomeDaVotacao, uint256 voto) public {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe");
+    function votar(string calldata nomeDaVotacao, uint256 voto) notPaused votacaoNaoExiste(nomeDaVotacao) public {
         require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
         require(!isVotoRepetido(nomeDaVotacao, msg.sender), "Eleitor ja votou.");
         require(voto == 1 || voto == 0, "Voto invalido.");
@@ -151,9 +142,7 @@ contract SimNaoVotos is Ownable {
         jaVotou[nomeDaVotacao].push(msg.sender); 
     }
 
-    function votosAtual(string memory nomeDaVotacao) public view returns (uint256[2] memory) {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe.");
+    function votosAtual(string calldata nomeDaVotacao) notPaused votacaoNaoExiste(nomeDaVotacao) public view returns (uint256[2] memory) {
         require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
 
         uint256[2] memory resultado_votacao = [votos[nomeDaVotacao][0], votos[nomeDaVotacao][1]];
@@ -161,7 +150,7 @@ contract SimNaoVotos is Ownable {
         return resultado_votacao;
     }
 
-    function isVotoRepetido (string memory nomeDaVotacao, address eleitor) internal returns (bool) {
+    function isVotoRepetido (string calldata nomeDaVotacao, address eleitor) internal returns (bool) {
         if (jaVotou[nomeDaVotacao].length == 0) {
             return false;
         }
@@ -173,8 +162,7 @@ contract SimNaoVotos is Ownable {
         return false;
     }
 
-    function quemJaVotou(string memory nomeDaVotacao) public view returns (address[] memory) {
-        require(!isPaused, "Contrato pausado.");
+    function quemJaVotou(string calldata nomeDaVotacao) notPaused public view returns (address[] memory) {
         return jaVotou[nomeDaVotacao];
     }
 }

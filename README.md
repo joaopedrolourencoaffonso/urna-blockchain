@@ -1,6 +1,41 @@
 # Urna blockchain
 
-Um pequeno projeto para praticar conhecimentos em solidity.
+Um pequeno projeto para praticar conhecimentos de blockchain, smart contracts e web3.
+
+## Metas
+
+### [SimNaoVotos.sol](./SimNaoVotos.sol)
+- [X] Pausável
+- [X] Cadastrar eleitores
+- [X] Autenticar eleitor
+- [X] Cadastrar votações de "sim" ou "não"
+- [X] Votar nas votações de "sim" ou "não"
+- [X] Verificar se voto é repetido
+- [X] Retornar resultado de votação
+- [X] Retornar lista de votações
+- [X] Retornar lista de eleitores que votaram em certa votação
+- [X] Retornar status e detalhes de uma certa votação
+- [X] Editar status e detalhes de uma certa votação
+- [X] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
+- [X] Testar 100% do contrato
+- [X] Otimizar uso de gas
+
+### [MultiplaEscolha.sol](MultiplaEscolha.sol)
+- [ ] Cadastrar votações com múltiplas opções (além do "sim" ou "não")
+- [ ] Votar nas votações com múltiplas opções
+- [ ] Verificar se voto é repetido
+- [ ] Retornar resultado de votação
+- [ ] Retornar lista de votações
+- [ ] Retornar lista de eleitores que votaram em certa votação
+- [ ] Retornar status e detalhes de uma certa votação
+- [ ] Editar status e detalhes de uma certa votação
+- [ ] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
+- [ ] Testar 100% do contrato
+- [ ] Otimizar uso de gas
+
+## Interface Web
+
+Futuro Desenvolvimento.
 
 ## Como usar
 
@@ -27,25 +62,25 @@ Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-report
 ·······························|·················|···············|·················|················|···············
 |  SimNaoVotos                 ·                                                                                   │
 ·······························|·················|···············|·················|················|···············
-|      adicionaEleitor         ·         57,203  ·       74,135  ·         65,516  ·            43  ·           -  │
+|      adicionaEleitor         ·         76,387  ·       93,499  ·         79,578  ·            43  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      cadastrarVotacao        ·        131,934  ·      149,130  ·        141,337  ·            11  ·           -  │
+|      cadastrarVotacao        ·        130,030  ·      147,226  ·        139,433  ·            11  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      editaDetalhesDeVotacao  ·              -  ·            -  ·         37,243  ·             1  ·           -  │
+|      editaDetalhesDeVotacao  ·              -  ·            -  ·         36,033  ·             1  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      editaStatusDeVotacao    ·              -  ·            -  ·         35,034  ·             1  ·           -  │
+|      editaStatusDeVotacao    ·              -  ·            -  ·         33,846  ·             1  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      excluiEleitor           ·              -  ·            -  ·         42,855  ·             1  ·           -  │
+|      excluiEleitor           ·              -  ·            -  ·         41,801  ·             1  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      pause                   ·              -  ·            -  ·         45,684  ·             9  ·           -  │
+|      pause                   ·              -  ·            -  ·         45,772  ·             9  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      unpause                 ·              -  ·            -  ·         23,784  ·             1  ·           -  │
+|      unpause                 ·              -  ·            -  ·         23,762  ·             1  ·           -  │
 ·······························|·················|···············|·················|················|···············
-|      votar                   ·         81,993  ·      111,659  ·         99,086  ·            23  ·           -  │
+|      votar                   ·         76,770  ·      106,844  ·         88,717  ·            23  ·           -  │
 ·······························|·················|···············|·················|················|···············
 |  Deployments                                   ·                                 ·  % of limit    ·              │
 ·······························|·················|···············|·················|················|···············
-|  SimNaoVotos                 ·              -  ·            -  ·      2,929,832  ·         9.8 %  ·           -  │
+|  SimNaoVotos                 ·              -  ·            -  ·      3,058,502  ·        10.2 %  ·           -  │
 ·······························|·················|···············|·················|················|···············
 |  Key                                                                                                             │
 ····················································································································
@@ -57,6 +92,4 @@ Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-report
 ····················································································································
 ```
 
-Por comparação, com o preço atual (18/05/2024) de [15,878 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 13 reais para executar a função `cadastrarVotacao` e  276,3 reais para implementar na rede Ethereum.
-
-Tornar o uso de gas mais eficiente é o próximo passo.
+Por comparação, na rede **Ethereum**, com o preço atual (18/05/2024) de [15,878 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 13 reais para executar a função `cadastrarVotacao` e  291,35 reais para implementar na rede Ethereum. A função `votar`, que deveria ser a mais utilizada, deveria custar em torno R$ 8,45 reais.

@@ -8,56 +8,55 @@ Um pequeno projeto para praticar conhecimentos em solidity.
 2. Salve o [`voting.sol`](./voting.sol) na sua pasta `contracts`.
 3. Salve o [`interact-voting.js`](./interact-voting.js) na sua pasta `scripts`.
 4. Salve o [`test-voting.js`](./test-voting.js) na sua pasta `test`.
-5. Para visualizar um exemplo de interação com o contrato use: `npx hardhat run .\scripts\interact-voting.js`, o resultado deveria ser similar ao abaixo:
+
+Pronto, basta usar os comandos `npx hardhat coverage` para executar os testes e observar a cobertura.
+
+## Preço da execução
+
+Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter), temos os seguintes preços de execução. 
 
 ```bash
-> npx hardhat run .\scripts\interact-voting.js
-Lista de eleitores:  Result(20) [
-  '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-  '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
-  '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
-  '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-  '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
-  '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
-  '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
-  '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
-  '0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f',
-  '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
-  '0xBcd4042DE499D14e55001CcbB24a551F3b954096',
-  '0x71bE63f3384f5fb98995898A86B02Fb2426c5788',
-  '0xFABB0ac9d68B0B445fB7357272Ff202C5651694a',
-  '0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec',
-  '0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097',
-  '0xcd3B766CCDd6AE721141F452C550Ca635964ce71',
-  '0x2546BcD3c84621e976D8185a91A922aE77ECEc30',
-  '0xbDA5747bFD65F08deb54cb465eB87D40e51B197E',
-  '0xdD2FD4581271e230360230F9337D5c0430Bf44C0',
-  '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199'
-]
------
-Lista de eleitores:  Result(19) [
-  '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266',
-  '0x70997970C51812dc3A010C7d01b50e0d17dc79C8',
-  '0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC',
-  '0x90F79bf6EB2c4f870365E785982E1f101E93b906',
-  '0x15d34AAf54267DB7D7c367839AAf71A00a2C6A65',
-  '0x9965507D1a55bcC2695C58ba16FB37d819B0A4dc',
-  '0x976EA74026E726554dB657fA54763abd0C3a0aa9',
-  '0x14dC79964da2C08b23698B3D3cc7Ca32193d9955',
-  '0x23618e81E3f5cdF7f54C3d65f7FBc0aBf5B21E8f',
-  '0xa0Ee7A142d267C1f36714E4a8F75612F20a79720',
-  '0xBcd4042DE499D14e55001CcbB24a551F3b954096',
-  '0x71bE63f3384f5fb98995898A86B02Fb2426c5788',
-  '0xFABB0ac9d68B0B445fB7357272Ff202C5651694a',
-  '0x1CBd3b2770909D4e10f157cABC84C7264073C9Ec',
-  '0xdF3e18d64BC6A983f673Ab319CCaE4f1a57C7097',
-  '0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199',
-  '0x2546BcD3c84621e976D8185a91A922aE77ECEc30',
-  '0xbDA5747bFD65F08deb54cb465eB87D40e51B197E',
-  '0xdD2FD4581271e230360230F9337D5c0430Bf44C0'
-]
-O endereço  0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266 :  true
-O número atual de eleitores é:  19n
-O status da votação é:  Em Andamento
-O número de votos como 'NÃO' é:  5n  c omo 'SIM' é:  0n
+····················································································································
+|  Solidity and Network Configuration                                                                              │
+·······························|·················|···············|·················|································
+|  Solidity: 0.8.24            ·  Optim: false   ·  Runs: 200    ·  viaIR: false   ·     Block: 30,000,000 gas     │
+·······························|·················|···············|·················|································
+|  Methods                                                                                                         │
+·······························|·················|···············|·················|················|···············
+|  Contracts / Methods         ·  Min            ·  Max          ·  Avg            ·  # calls       ·  usd (avg)   │
+·······························|·················|···············|·················|················|···············
+|  SimNaoVotos                 ·                                                                                   │
+·······························|·················|···············|·················|················|···············
+|      adicionaEleitor         ·         57,203  ·       74,135  ·         65,516  ·            43  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      cadastrarVotacao        ·        131,934  ·      149,130  ·        141,337  ·            11  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      editaDetalhesDeVotacao  ·              -  ·            -  ·         37,243  ·             1  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      editaStatusDeVotacao    ·              -  ·            -  ·         35,034  ·             1  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      excluiEleitor           ·              -  ·            -  ·         42,855  ·             1  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      pause                   ·              -  ·            -  ·         45,684  ·             9  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      unpause                 ·              -  ·            -  ·         23,784  ·             1  ·           -  │
+·······························|·················|···············|·················|················|···············
+|      votar                   ·         81,993  ·      111,659  ·         99,086  ·            23  ·           -  │
+·······························|·················|···············|·················|················|···············
+|  Deployments                                   ·                                 ·  % of limit    ·              │
+·······························|·················|···············|·················|················|···············
+|  SimNaoVotos                 ·              -  ·            -  ·      2,929,832  ·         9.8 %  ·           -  │
+·······························|·················|···············|·················|················|···············
+|  Key                                                                                                             │
+····················································································································
+|  ◯  Execution gas for this method does not include intrinsic gas overhead                                        │
+····················································································································
+|  △  Cost was non-zero but below the precision setting for the currency display (see options)                     │
+····················································································································
+|  Toolchain:  hardhat                                                                                             │
+····················································································································
 ```
+
+Por comparação, com o preço atual (18/05/2024) de [15,878 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 13 reais para executar a função `cadastrarVotacao` e  276,3 reais para implementar na rede Ethereum.
+
+Tornar o uso de gas mais eficiente é o próximo passo.

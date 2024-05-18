@@ -5,7 +5,7 @@ const {
 const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
-describe("Contrato voting.sol", function () {
+describe("Testando contrato de votações", function () {
   // We define a fixture to reuse the same setup in every test.
   // We use loadFixture to run this setup once, snapshot that state,
   // and reset Hardhat Network to that snapshot in every test.
@@ -13,7 +13,7 @@ describe("Contrato voting.sol", function () {
     const lista_de_eleitores = await ethers.getSigners();
     const nove_eleitores = lista_de_eleitores.slice(0,8);
     const dez_eleitores = lista_de_eleitores.slice(9,18);
-    const Contrato = await ethers.getContractFactory("Voting");
+    const Contrato = await ethers.getContractFactory("SimNaoVotos");
     const contrato = await Contrato.deploy(lista_de_eleitores[0].address);
 
     return { contrato, lista_de_eleitores, nove_eleitores, dez_eleitores };
@@ -171,6 +171,28 @@ describe("Contrato voting.sol", function () {
       await contrato.connect(lista_de_eleitores[0]).pause();
       await expect(contrato.connect(lista_de_eleitores[0]).retornaVotacoes()).to.be.revertedWith("Contrato pausado.");
     });
+    it("Testando 'onlyOwner'", async function () {
+      const { contrato, lista_de_eleitores } = await loadFixture(deploy);
+
+      // Adicionando eleitores
+      await contrato.connect(lista_de_eleitores[0]).adicionaEleitor(lista_de_eleitores[1]);
+      await contrato.connect(lista_de_eleitores[0]).adicionaEleitor(lista_de_eleitores[2]);
+
+      // deveria reverter
+      await expect(contrato.connect(lista_de_eleitores[1]).adicionaEleitor(lista_de_eleitores[2])).to.be.reverted;
+      await expect(contrato.connect(lista_de_eleitores[1]).excluiEleitor(lista_de_eleitores[2])).to.be.reverted;
+      await expect(contrato.connect(lista_de_eleitores[1]).cadastrarVotacao("Votacao 1","Em andamento.","Teste de votacao.")).to.be.reverted;
+
+      // cadastrando uma votacao
+      contrato.connect(lista_de_eleitores[0]).cadastrarVotacao("Votacao 1","Em andamento.","Teste de votacao.")
+
+      await expect(contrato.connect(lista_de_eleitores[1]).editaStatusDeVotacao("Votacao 1","Concluída.")).to.be.reverted;
+      await expect(contrato.connect(lista_de_eleitores[1]).editaDetalhesDeVotacao("Votacao 1","Teste de votacao 2.")).to.be.reverted;
+
+      await expect(contrato.connect(lista_de_eleitores[1]).pause()).to.be.reverted;
+      await contrato.connect(lista_de_eleitores[0]).pause();
+      await expect(contrato.connect(lista_de_eleitores[1]).unpause()).to.be.reverted;
+    });
   });
   describe("Testando funções de votação", function () {
     it("Testando função de registrar votos", async function () {
@@ -228,11 +250,12 @@ describe("Contrato voting.sol", function () {
       await expect(contrato.connect(lista_de_eleitores[0]).votar("Votacao 1",0)).to.be.revertedWith("Contrato pausado.");
       await expect(contrato.connect(lista_de_eleitores[0]).votosAtual("Votacao 1")).to.be.revertedWith("Contrato pausado.");
     });
-    it("Simulando uma votação", async function () {
+    it("Simulando votações", async function () {
       const { contrato, lista_de_eleitores, nove_eleitores, dez_eleitores } = await loadFixture(deploy);
 
       // cadastrando votações
       await contrato.connect(lista_de_eleitores[0]).cadastrarVotacao("Votacao 1","Em andamento.","Teste de votacao 1.");
+      await contrato.connect(lista_de_eleitores[0]).cadastrarVotacao("Votacao 2","Em andamento.","Teste de votacao 2.");
 
       // cadastrando eleitores
       let approveTx;
@@ -242,20 +265,29 @@ describe("Contrato voting.sol", function () {
         approveTx.wait();
       }
 
-      // enviando 9 votos
-      for (eleitor of [0,1,2,3]) {
+      // enviando 5 votos para votacao 1
+      for (eleitor of [1,2,3,4,5]) {
         approveTx = await contrato.connect(lista_de_eleitores[eleitor]).votar("Votacao 1",0);
         approveTx.wait();
       }
 
-      // enviando outros 10 votos e encerrando a votação
-      for (eleitor of [4,5,6,7,8]) {
-        approveTx = await contrato.connect(lista_de_eleitores[eleitor]).votar("Votacao 1",1);
+      // enviando outros 5 votos para votacao 2
+      for (eleitor of [1,2,3,4,5]) {
+        approveTx = await contrato.connect(lista_de_eleitores[eleitor]).votar("Votacao 2",1);
         approveTx.wait();
       }
 
       // deveria reverter, pois eleição já foi encerrada
-      await expect(contrato.connect(lista_de_eleitores[9]).votar("Votacao 1",1)).to.be.revertedWith("Votacao encerrada, resultado: 'Sim'");
+      await expect(contrato.connect(lista_de_eleitores[0]).votar("Votacao 1",1)).to.be.revertedWith("Votacao encerrada, usa a funcao 'votosAtual' para checar o resultado");
+      await expect(contrato.connect(lista_de_eleitores[0]).votar("Votacao 2",1)).to.be.revertedWith("Votacao encerrada, usa a funcao 'votosAtual' para checar o resultado");
+
+      // Número de votos
+      let votos_atual = await contrato.connect(lista_de_eleitores[0]).votosAtual("Votacao 1");
+      await expect(votos_atual[0]).to.equal(5);
+      await expect(votos_atual[1]).to.equal(0);
+      votos_atual = await contrato.connect(lista_de_eleitores[0]).votosAtual("Votacao 2");
+      await expect(votos_atual[0]).to.equal(0);
+      await expect(votos_atual[1]).to.equal(5);
     });
   });
 });

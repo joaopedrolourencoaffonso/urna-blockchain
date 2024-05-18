@@ -15,6 +15,7 @@ contract Voting is Ownable {
     address[] internal eleitores;
     bool internal isPaused = false;
     mapping(string => string) public votacoes;
+    mapping(string => bool) public votacoesExist;
     mapping(string => string) public listaDeVotacoes;
     string[] internal listaDeNomesDeVotacoes;
     mapping(string => uint256[]) public votos;
@@ -41,6 +42,7 @@ contract Voting is Ownable {
 
     function excluiEleitor(address eleitor) external onlyOwner {
         require(!isPaused, "Contrato pausado.");
+        require(isEleitor(eleitor), "Eleitor nao cadastrado.");
         
         for (uint256 i = 0; i < eleitores.length - 1; i++) {
             if (eleitores[i] == eleitor) {
@@ -77,32 +79,43 @@ contract Voting is Ownable {
     function cadastrarVotacao(string memory nomeDaVotacao, string memory status, string memory detalhes) external onlyOwner {
         require(!isPaused, "Contrato pausado.");
         require(bytes(votacoes[nomeDaVotacao]).length == 0, "Votacao ja existe");
+        require(bytes(status).length != 0, "Status nao pode ser vazio");
+        
         votacoes[nomeDaVotacao] = status;
-        votos[nomeDaVotacao].push(0);
-        votos[nomeDaVotacao].push(0);
         listaDeVotacoes[nomeDaVotacao] = detalhes;
         listaDeNomesDeVotacoes.push(nomeDaVotacao);
+
+        votos[nomeDaVotacao] = [0,0];
     }
 
     function editaStatusDeVotacao (string memory nomeDaVotacao, string memory status) external onlyOwner {
         require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length >= 0, "Votacao nao existe");
+        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
         votacoes[nomeDaVotacao] = status;
     }
 
     function editaDetalhesDeVotacao (string memory nomeDaVotacao, string memory detalhes) external onlyOwner {
         require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length >= 0, "Votacao nao existe");
+        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
         listaDeVotacoes[nomeDaVotacao] = detalhes;
     }
 
     function statusDeVotacao(string memory nomeDaVotacao) public view returns (string memory) {
         require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length >= 0, "Votacao nao existe");
+        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
+        
         return votacoes[nomeDaVotacao];
     }
 
+    function detalhesDeVotacao(string memory nomeDaVotacao) public view returns (string memory) {
+        require(!isPaused, "Contrato pausado.");
+        require(bytes(votacoes[nomeDaVotacao]).length != 0, "Votacao nao existe");
+        
+        return listaDeVotacoes[nomeDaVotacao];
+    }
+
     function retornaVotacoes() public view returns (string memory) {
+        require(!isPaused, "Contrato pausado.");
         string memory stringListaDeVotacoes = "";
 
         for (uint256 i = 0; i <= listaDeNomesDeVotacoes.length - 1; i++) {
@@ -111,36 +124,15 @@ contract Voting is Ownable {
         
         return stringListaDeVotacoes;
     }
-
-    function votosAtual(string memory nomeDaVotacao) public view returns (uint256[2] memory) {
-        require(!isPaused, "Contrato pausado.");
-        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe");
-        require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
-
-        uint256[2] memory resultado_votacao = [votos[nomeDaVotacao][0], votos[nomeDaVotacao][1]];
-
-        return resultado_votacao;
-    }
-
-    function isVotoRepetido (string memory nomeDaVotacao, address eleitor) internal returns (bool) {
-        if (jaVotou[nomeDaVotacao].length == 0) {
-            return false;
-        }
-        for (uint256 i = 0; i <= jaVotou[nomeDaVotacao].length - 1; i++) {
-            if (jaVotou[nomeDaVotacao][i] == eleitor) {
-                return true;
-            }
-        }
-        return false;
-    }
-
+    
     function votar(string memory nomeDaVotacao, uint256 voto) public {
         require(!isPaused, "Contrato pausado.");
         require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe");
         require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
         require(!isVotoRepetido(nomeDaVotacao, msg.sender), "Eleitor ja votou.");
         require(voto == 1 || voto == 0, "Voto invalido.");
-        require(2 * votos[nomeDaVotacao][0] <= eleitores.length || 2 * votos[nomeDaVotacao][1] <= 2 * eleitores.length, votacoes[nomeDaVotacao]);
+        require(votacoes[nomeDaVotacao] != "1", votacoes[nomeDaVotacao]);
+        require(votacoes[nomeDaVotacao] != "0", votacoes[nomeDaVotacao]);
         
         //0 para NÃO e 1 para SIM
         if (voto == 0) {
@@ -158,6 +150,28 @@ contract Voting is Ownable {
         }
 
         jaVotou[nomeDaVotacao].push(msg.sender); 
+    }
+
+    function votosAtual(string memory nomeDaVotacao) public view returns (uint256[2] memory) {
+        require(!isPaused, "Contrato pausado.");
+        require(bytes(votacoes[nomeDaVotacao]).length > 0, "Votacao nao existe.");
+        require(isEleitor(msg.sender),"Eleitor nao cadastrado.");
+
+        uint256[2] memory resultado_votacao = [votos[nomeDaVotacao][0], votos[nomeDaVotacao][1]];
+
+        return resultado_votacao;
+    }
+
+    function isVotoRepetido (string memory nomeDaVotacao, address eleitor) internal returns (bool) {
+        if (jaVotou[nomeDaVotacao].length == 0) {
+            return false;
+        }
+        for (uint256 i = 0; i <= jaVotou[nomeDaVotacao].length - 1; i++) {
+            if (jaVotou[nomeDaVotacao][i] == eleitor) {
+                return true;
+            }
+        }
+        return false;
     }
 
     function quemJaVotou(string memory nomeDaVotacao) public view returns (address[] memory) {

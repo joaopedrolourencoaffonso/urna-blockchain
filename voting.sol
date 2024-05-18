@@ -3,7 +3,6 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/math/Math.sol";
 import "hardhat/console.sol";
 
 contract SimNaoVotos is Ownable {
@@ -14,13 +13,12 @@ contract SimNaoVotos is Ownable {
     // Variaveis e eventos
     address[] internal eleitores;
     bool internal isPaused = false;
-    mapping(string => string) public votacoes;
-    mapping(string => bool) public votacoesExist;
-    mapping(string => string) public listaDeVotacoes;
     string[] internal listaDeNomesDeVotacoes;
+    mapping(string => string) public votacoes;
+    mapping(string => string) public listaDeVotacoes;
     mapping(string => uint256[]) public votos;
-    event fimDeVotacao(string indexed nomeDaVotacao, string resultado);
     mapping(string => address[]) public jaVotou;
+    event fimDeVotacao(string indexed nomeDaVotacao, string resultado);
 
     function pause() public onlyOwner {
         isPaused = true;

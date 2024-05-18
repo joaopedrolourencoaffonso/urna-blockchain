@@ -2,9 +2,7 @@
 
 Um pequeno projeto para praticar conhecimentos de blockchain, smart contracts e web3.
 
-## Metas
-
-### [SimNaoVotos.sol](./SimNaoVotos.sol)
+## [SimNaoVotos.sol](./SimNaoVotos.sol)
 - [X] Pausável
 - [X] Cadastrar eleitores
 - [X] Autenticar eleitor
@@ -20,33 +18,16 @@ Um pequeno projeto para praticar conhecimentos de blockchain, smart contracts e 
 - [X] Testar 100% do contrato
 - [X] Otimizar uso de gas
 
-### [MultiplaEscolha.sol](MultiplaEscolha.sol)
-- [ ] Cadastrar votações com múltiplas opções (além do "sim" ou "não")
-- [ ] Votar nas votações com múltiplas opções
-- [ ] Verificar se voto é repetido
-- [ ] Retornar resultado de votação
-- [ ] Retornar lista de votações
-- [ ] Retornar lista de eleitores que votaram em certa votação
-- [ ] Retornar status e detalhes de uma certa votação
-- [ ] Editar status e detalhes de uma certa votação
-- [ ] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
-- [ ] Testar 100% do contrato
-- [ ] Otimizar uso de gas
-
-## Interface Web
-
-Futuro Desenvolvimento.
-
 ## Como usar
 
 1. Crie um projeto Hardhat normalmente
-2. Salve o [`voting.sol`](./voting.sol) na sua pasta `contracts`.
+2. Salve o [`SimNaoVotos.sol`](./SimNaoVotos.sol) na sua pasta `contracts`.
 3. Salve o [`interact-voting.js`](./interact-voting.js) na sua pasta `scripts`.
-4. Salve o [`test-voting.js`](./test-voting.js) na sua pasta `test`.
+4. Salve o [`test-SimNaoVotos.js`](./test-SimNaoVotos.js) na sua pasta `test`.
 
 Pronto, basta usar os comandos `npx hardhat coverage` para executar os testes e observar a cobertura.
 
-## Preço da execução
+### Preço da execução
 
 Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter), temos os seguintes preços de execução. 
 
@@ -93,3 +74,22 @@ Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-report
 ```
 
 Por comparação, na rede **Ethereum**, com o preço atual (18/05/2024) de [15,878 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 13 reais para executar a função `cadastrarVotacao` e  291,35 reais para implementar na rede Ethereum. A função `votar`, que deveria ser a mais utilizada, deveria custar em torno R$ 8,45 reais.
+
+
+## [MultiplaEscolha.sol](MultiplaEscolha.sol)
+- [ ] Cadastrar votações com múltiplas opções (além do "sim" ou "não")
+- [ ] Votar nas votações com múltiplas opções
+- [ ] Verificar se voto é repetido
+- [ ] Retornar resultado de votação
+- [ ] Retornar lista de votações
+- [ ] Retornar lista de eleitores que votaram em certa votação
+- [ ] Retornar status e detalhes de uma certa votação
+- [ ] Editar status e detalhes de uma certa votação
+- [ ] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
+- [ ] Testar 100% do contrato
+- [ ] Otimizar uso de gas
+
+## Interface Web
+
+Futuro Desenvolvimento.
+

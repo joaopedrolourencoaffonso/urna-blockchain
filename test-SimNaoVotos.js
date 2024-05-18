@@ -6,9 +6,6 @@ const { anyValue } = require("@nomicfoundation/hardhat-chai-matchers/withArgs");
 const { expect } = require("chai");
 
 describe("Testando contrato de votações", function () {
-  // We define a fixture to reuse the same setup in every test.
-  // We use loadFixture to run this setup once, snapshot that state,
-  // and reset Hardhat Network to that snapshot in every test.
   async function deploy() {
     const lista_de_eleitores = await ethers.getSigners();
     const nove_eleitores = lista_de_eleitores.slice(0,8);
@@ -211,7 +208,7 @@ describe("Testando contrato de votações", function () {
 
       // Deveria reverter por votação não existir
       await expect(contrato.connect(lista_de_eleitores[0]).votar("Votacao 3",0)).to.be.revertedWith("Votacao nao existe");
-
+      
       // Enviando alguns votos
       await contrato.connect(lista_de_eleitores[0]).votar("Votacao 1",0);
       await contrato.connect(lista_de_eleitores[1]).votar("Votacao 1",0);
@@ -238,7 +235,7 @@ describe("Testando contrato de votações", function () {
       await expect(votos_atual[1]).to.equal(1);
 
       // Deveria reverter pois a votacao 2 não existe
-      await expect(contrato.connect(lista_de_eleitores[0]).votosAtual("Votacao 2")).to.be.revertedWith("Votacao nao existe.");
+      await expect(contrato.connect(lista_de_eleitores[0]).votosAtual("Votacao 2")).to.be.revertedWith("Votacao nao existe");
 
       // Deveria reverter pois a conta não foi cadastrada
       await expect(contrato.connect(dez_eleitores[1]).votosAtual("Votacao 1")).to.be.revertedWith("Eleitor nao cadastrado.");

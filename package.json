@@ -1,8 +1,8 @@
 {
-  "name": "hardhat-tutorial",
-  "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "name": "urna-blockchain",
+  "version": "2.0.0",
+  "description": "Uma série de contratos para manejar votações em redes baseadas no ethereum.",
+  "main": "hardhat.config.js",
   "scripts": {
     "test": "npx hardhat test",
     "deploy": "npx hardhat run scripts\\deploy-voting.js --network localhost"

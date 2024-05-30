@@ -1,15 +1,16 @@
 {
   "name": "urna-blockchain",
   "version": "2.0.0",
-  "description": "Uma série de contratos para manejar votações em redes baseadas no ethereum.",
+  "description": "Uma série de contratos para manejar votações em redes baseadas no protocolo ethereum.",
   "main": "hardhat.config.js",
   "scripts": {
     "test": "npx hardhat test",
-    "deploy": "npx hardhat run scripts\\deploy-voting.js --network localhost"
+    "SimNaoVotos": "npx hardhat run scripts\\deploy-SimNaoVotos.js --network localhost",
+    "MultiplaEscolha": "npx hardhat run scripts\\deploy-MultiplaEscolha.js --network localhost"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "João Pedro Lourenço Affonso",
+  "license": "",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@openzeppelin/contracts": "^5.0.2",

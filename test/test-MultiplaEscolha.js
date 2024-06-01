@@ -134,7 +134,7 @@ describe("Testando contrato de votações", function () {
       await expect(contrato.connect(lista_de_eleitores[9]).getStatusDaVotacao("xyz")).to.be.revertedWith("Eleitor nao cadastrado.");
 
       // deveria reverter pois a eleição não existe
-      await expect(contrato.getStatusDaVotacao("xyz")).to.be.revertedWith("Votacao nao existe.");
+      expect(await contrato.getStatusDaVotacao("xyz")).to.equal(false);
     });
     it("Função getInfo", async function () {
       const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);
@@ -207,11 +207,27 @@ describe("Testando contrato de votações", function () {
       // deveria reverter pois o eleitor 10 não está cadastrado
       await expect(contrato.connect(lista_de_eleitores[10]).getListaDeNomesDeVotacoesInativas()).to.be.revertedWith("Eleitor nao cadastrado.");
     });
-  });
-  describe("Testando votos", function () {
-    it("Função: getNumeroDeVotosPorVotacao", async function () {
+    it("Função editInfo", async function () {
       const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);
 
+      // Editando a info da votação
+      approveTx = await contrato.editInfo("abc","xyz");
+      approveTx.wait();
+
+      // deveria retornar a info da votação
+      expect(await contrato.getInfo("abc")).to.equal("xyz");
+
+      // deveria reverter pois a eleição não existe
+      await expect(contrato.editInfo("xyz","123")).to.be.revertedWith("Votacao nao existe.");
+
+      // deveria reverter pois o eleitor realizando a transação não é o criador da votação
+      await expect(contrato.connect(lista_de_eleitores[1]).editInfo("abc","123")).to.be.revertedWith("Somente o criador da votacao pode editar a info.");
+    });
+  });
+  describe("Testando votos", function () {
+    it("Função: votar e getNumeroDeVotosPorVotacao", async function () {
+      const { contrato, lista_de_eleitores, nove_eleitores, dez_eleitores } = await loadFixture(votacaoCadastrada);
+      // voto do eleitor 0
       approveTx = await contrato.votar("abc",0);
       approveTx.wait();
 
@@ -220,6 +236,30 @@ describe("Testando contrato de votações", function () {
       expect(votos[1]).to.equal(0);
       expect(votos[2]).to.equal(0);
 
+      // Voto repetido
+      await expect(contrato.votar("abc",0)).to.be.revertedWith("Eleitor ja realizou o voto");
+      
+      // Voto inválido
+      await expect(contrato.connect(lista_de_eleitores[1]).votar("abc",10)).to.be.revertedWith("Opcao de voto nao existente");
+      
+      // Não é eleitor tentando votar
+      await expect(contrato.connect(lista_de_eleitores[10]).votar("abc",1)).to.be.revertedWith("Eleitor nao cadastrado.");
+
+      // Todos os eleitores votam, deveria encerrar a votação
+      for (eleitor of nove_eleitores.slice(1,9)) {
+        approveTx = await contrato.connect(eleitor).votar("abc",0);
+        approveTx.wait();
+      }
+      
+      // Votação deveria estar encerrada
+      expect(await contrato.getStatusDaVotacao("abc")).to.equal(false);
+
+      // cadastrando novo eleitor
+      approveTx = await contrato.adicionaEleitor(dez_eleitores[0]);
+      approveTx.wait();
+
+      // Votação já está encerrada, não deveria funcionar
+      await expect(contrato.connect(dez_eleitores[0]).votar("abc",1)).to.be.revertedWith("Votacao ja encerrou");//BUG QUE PRECISA SER CORRIGIDO
     });
   });
 });

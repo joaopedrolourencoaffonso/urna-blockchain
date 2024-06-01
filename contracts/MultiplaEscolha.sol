@@ -19,10 +19,28 @@ contract MultiplaEscolha is Ownable {
     mapping(string => string) public infoVotacoes;
     mapping(string => address) public donoDaVotacao;
     mapping(address => string[]) public votacoesIniciadasPorEleitor;
+    mapping(string => address[]) public jaVotou;
     mapping(address => bool) public mappingEleitores;
     mapping(string => bool) public statusDaVotacao;
-    event fimDeVotacao(string indexed nomeDaVotacao, string resultado);
-    event VotacaoCadastrada(string message);
+    event VotacaoCadastrada(string nomeDaVotacao);
+    event VotacaoEncerrada(string nomeDaVotacao, string motivo);
+    event anuncio(string indexed titulo, string info);
+
+    // modificadores
+    modifier notPaused {
+        require(!isPaused, "Contrato pausado.");
+        _;
+    }
+
+    modifier isEleitor(address eleitor) {
+        require(mappingEleitores[eleitor], "Eleitor nao cadastrado.");
+        _;
+    }
+
+    modifier isVotacao(string calldata nomeDaVotacao) {
+        require(statusDaVotacao[nomeDaVotacao], "Votacao nao existe.");
+        _;
+    }
 
     // funcoes e modificadores referentes ao pausamento do contrato
     function pause() public onlyOwner {
@@ -37,28 +55,14 @@ contract MultiplaEscolha is Ownable {
         return isPaused;
     }
 
-    modifier notPaused {
-        require(!isPaused, "Contrato pausado.");
-        _;
-    }
-
-    // funcoes e modificadores relativas a eleitores
-    function isEleitor(address eleitor) notPaused public view returns (bool) {
-        return mappingEleitores[eleitor];
-    }
-
-    modifier isEleitorModifier(address eleitor) {
-        require(mappingEleitores[eleitor], "Eleitor nao cadastrado.");
-        _;
-    }
-
+    // funcoes relativas a eleitores
     function adicionaEleitor(address eleitor) notPaused external onlyOwner {
-        require(!isEleitor(eleitor), "Eleitor ja cadastrado.");
+        require(!mappingEleitores[eleitor], "Eleitor ja cadastrado.");
         mappingEleitores[eleitor] = true;
         eleitores.push(eleitor);
     }
 
-    function excluiEleitor(address eleitor) notPaused isEleitorModifier(eleitor) external onlyOwner {
+    function excluiEleitor(address eleitor) notPaused isEleitor(eleitor) external onlyOwner {
         
         for (uint256 i = 0; i < eleitores.length - 1; i++) {
             if (eleitores[i] == eleitor) {
@@ -70,12 +74,16 @@ contract MultiplaEscolha is Ownable {
         mappingEleitores[eleitor] = false;
     }
 
-    function retornaEleitores() notPaused isEleitorModifier(msg.sender) public view returns (address[] memory) {
+    function retornaEleitores() notPaused isEleitor(msg.sender) public view returns (address[] memory) {
         return eleitores;
     }
 
+    function eleitorCadastrado(address eleitor) notPaused isEleitor(msg.sender) external view returns (bool) {
+        return mappingEleitores[eleitor];
+    }
+
     // funcoes relativas a votacao
-    function cadastrarVotacao(string calldata nomeDaVotacao, string calldata info, uint256 numeroDeOpcoes) notPaused() isEleitorModifier(msg.sender) public returns (string memory) {
+    function cadastrarVotacao(string calldata nomeDaVotacao, string calldata info, uint256 numeroDeOpcoes) notPaused() isEleitor(msg.sender) public returns (string memory) {
 
         listaDeNomesDeVotacoesAtivas.push(nomeDaVotacao);
         votacoesIniciadasPorEleitor[msg.sender].push(nomeDaVotacao);
@@ -93,42 +101,91 @@ contract MultiplaEscolha is Ownable {
     }
 
     // funcoes que retornam informacoes sobre votacao especifica ou votacoes como um todo
-    function _listaDeNomesDeVotacoesAtivas() public view notPaused isEleitorModifier(msg.sender) returns (string[] memory) {
+    function getListaDeNomesDeVotacoesAtivas() public view isEleitor(msg.sender) returns (string[] memory) {
         return listaDeNomesDeVotacoesAtivas;
     }
 
-    function _listaDeNomesDeVotacoesInativas() public view notPaused isEleitorModifier(msg.sender) returns (string[] memory) {
+    function getListaDeNomesDeVotacoesInativas() public view isEleitor(msg.sender) returns (string[] memory) {
         return listaDeNomesDeVotacoesInativas;
     }
 
-    function _votacoesIniciadasPorEleitor(address eleitor) public view notPaused() isEleitorModifier(msg.sender) returns (string[] memory) {
+    function getVotacoesIniciadasPorEleitor(address eleitor) public view isEleitor(msg.sender) returns (string[] memory) {
         return votacoesIniciadasPorEleitor[eleitor];
     }
 
-    function _donoDaVotacao(string calldata nomeDaVotacao) public view notPaused() isEleitorModifier(msg.sender) returns (address) {
+    function getDonoDaVotacao(string calldata nomeDaVotacao) public view isEleitor(msg.sender) isVotacao(nomeDaVotacao) returns (address) {
         return donoDaVotacao[nomeDaVotacao];
     }
 
-    function _info(string calldata nomeDaVotacao) public view notPaused isEleitorModifier(msg.sender) returns (string memory) {
+    function getInfo(string calldata nomeDaVotacao) public view isEleitor(msg.sender) isVotacao(nomeDaVotacao) returns (string memory) {
         return infoVotacoes[nomeDaVotacao];
     }
 
-    function _numeroDeVotosPorVotacao(string calldata nomeDaVotacao) public view notPaused isEleitorModifier(msg.sender) returns (uint256[] memory) {
+    function getNumeroDeVotosPorVotacao(string calldata nomeDaVotacao) public view isEleitor(msg.sender) isVotacao(nomeDaVotacao) returns (uint256[] memory) {
         return numeroDeVotosPorVotacao[nomeDaVotacao];
     }
 
-    function _statusDaVotacao(string calldata nomeDaVotacao) public view notPaused isEleitorModifier(msg.sender) returns (bool) {
+    function getStatusDaVotacao(string calldata nomeDaVotacao) public view isEleitor(msg.sender) isVotacao(nomeDaVotacao) returns (bool) {
         return statusDaVotacao[nomeDaVotacao];
     }
 
     // funcoes que editam as votacoes
-    function encerraVotacao(string calldata nomeDaVotacao) external notPaused {
-        require(donoDaVotacao[nomeDaVotacao] == msg.sender || msg.sender == owner(), "{'error':'Somente o eleitor que criou a votacao ou dono do contrato podem encerrar votacao.'}");
+    function encerraVotacao(string calldata nomeDaVotacao, string calldata motivo) external notPaused isVotacao(nomeDaVotacao) {
+        require(donoDaVotacao[nomeDaVotacao] == msg.sender || msg.sender == owner(), "Somente o eleitor que criou a votacao ou dono do contrato podem encerrar votacao.");
         statusDaVotacao[nomeDaVotacao] = false;
+
+        listaDeNomesDeVotacoesInativas.push(nomeDaVotacao);
+
+        for (uint256 i = 0; i < listaDeNomesDeVotacoesAtivas.length - 1; i++) {
+            if (keccak256(abi.encodePacked(listaDeNomesDeVotacoesAtivas[i])) == keccak256(abi.encodePacked(nomeDaVotacao))) {
+                listaDeNomesDeVotacoesAtivas[i] = listaDeNomesDeVotacoesAtivas[listaDeNomesDeVotacoesAtivas.length - 1];
+                break;
+            }
+        }
+        listaDeNomesDeVotacoesAtivas.pop();
+
+        emit VotacaoEncerrada(nomeDaVotacao, motivo);
+    }
+
+    function editInfo(string calldata nomeDaVotacao, string calldata info) external notPaused isVotacao(nomeDaVotacao) {
+        require(donoDaVotacao[nomeDaVotacao] == msg.sender, "{'error':'Somente o eleitor que criou a votacao podem editar a info da votacao.'}");
+        infoVotacoes[nomeDaVotacao] = info;
     }
 
     // funcoes relativas a votar
-    //function votar() returns (string memory) {
-    //
-    //}
+    function votar(string calldata nomeDaVotacao, uint256 opcao) external notPaused isEleitor(msg.sender) isVotacao(nomeDaVotacao) {
+        require(!isVotoRepetido(nomeDaVotacao, msg.sender),"Eleitor ja realizou o voto");
+        require(statusDaVotacao[nomeDaVotacao],"Votacao ja encerrou");
+        require(opcao < numeroDeVotosPorVotacao[nomeDaVotacao].length,"Opcao de voto nao existente");
+        
+        numeroDeVotosPorVotacao[nomeDaVotacao][opcao] += 1;
+        jaVotou[nomeDaVotacao].push(msg.sender);
+
+        if (jaVotou[nomeDaVotacao].length == eleitores.length) {
+            statusDaVotacao[nomeDaVotacao] = false;
+            emit VotacaoEncerrada(nomeDaVotacao, "Todos os eleitores votaram");
+        }
+    }
+
+    function isVotoRepetido (string calldata nomeDaVotacao, address eleitor) internal returns (bool) {
+        if (jaVotou[nomeDaVotacao].length == 0) {
+            return false;
+        }
+        for (uint256 i = 0; i <= jaVotou[nomeDaVotacao].length - 1; i++) {
+            if (jaVotou[nomeDaVotacao][i] == eleitor) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // retorna quem ja votou em certa votacao
+    function quemJaVotou(string calldata nomeDaVotacao) external notPaused isEleitor(msg.sender) isVotacao(nomeDaVotacao) returns (address[] memory) {
+        return jaVotou[nomeDaVotacao];
+    }
+
+    // emite anuncios
+    function anuncios(string calldata titulo, string calldata info) external notPaused isEleitor(msg.sender) {
+        emit anuncio(titulo, info);
+    }
 }

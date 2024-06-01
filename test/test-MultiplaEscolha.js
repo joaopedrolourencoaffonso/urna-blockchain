@@ -208,4 +208,18 @@ describe("Testando contrato de votações", function () {
       await expect(contrato.connect(lista_de_eleitores[10]).getListaDeNomesDeVotacoesInativas()).to.be.revertedWith("Eleitor nao cadastrado.");
     });
   });
+  describe("Testando votos", function () {
+    it("Função: getNumeroDeVotosPorVotacao", async function () {
+      const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);
+
+      approveTx = await contrato.votar("abc",0);
+      approveTx.wait();
+
+      let votos = await contrato.getNumeroDeVotosPorVotacao("abc");
+      expect(votos[0]).to.equal(1);
+      expect(votos[1]).to.equal(0);
+      expect(votos[2]).to.equal(0);
+
+    });
+  });
 });

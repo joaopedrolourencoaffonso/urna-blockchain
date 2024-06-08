@@ -30,7 +30,7 @@ contract PesquisaDeOpiniao is Ownable {
     mapping(uint256 => Votacao) public mappingVotacoes;
     //mapping(bytes32 => bool) public mappingJaVotou;
     mapping(uint256 => mapping(address => bool)) public mappingJaVotou;
-    event VotacaoCadastrada(string nomeDaVotacao);
+    event VotacaoCadastrada(uint256 idDaVotacao, string nomeDaVotacao);
     event VotacaoEncerrada(uint256 idDaVotacao, string motivo);
     event anuncio(string indexed titulo, string info);
 

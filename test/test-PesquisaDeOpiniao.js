@@ -130,6 +130,21 @@ describe("Testando contrato de votações", function () {
     approveTx = await contrato.connect(lista_de_eleitores[1]).cadastrarVotacao("3 + 3 = ? ","A - 3\nB - 6\nC - 12",3);
     approveTx.wait();
 
+    // editando nome da votacao
+    approveTx = await contrato.editNome(1,"string2");
+    approveTx.wait();
+    approveTx = await contrato.editDescricao(1,"string2");
+    approveTx.wait();
+
+    approveTx = await contrato.getVotacao(1);
+    expect(approveTx[0]).to.equal("string2");
+    expect(approveTx[1]).to.equal("string2");
+
+    // apenas o criador da votacao deveria ser capaz de editá-la
+    await expect(contrato.connect(lista_de_eleitores[2]).editNome(1,"string3")).to.be.revertedWith('Apenas o criador pode editar uma votacao');
+    await expect(contrato.connect(lista_de_eleitores[2]).editDescricao(1,"string3")).to.be.revertedWith('Apenas o criador pode editar uma votacao');
+
+    // vendo se alguém mais além doo dono do contrato ou o criador da votacao pode encerrar a votacao
     await expect(contrato.connect(lista_de_eleitores[2]).encerraVotacao(2,"teste")).to.be.revertedWith("Apenas o criador da votacao ou o dono do contrato podem encerrar uma votacao");
 
     // dono do contrato deveria ser capaz de encerrar o contrato
@@ -210,6 +225,8 @@ describe("Testando contrato de votações", function () {
     await expect(contrato.getVotacoes()).to.be.revertedWith("Contrato pausado.");
     await expect(contrato.votar(1,0)).to.be.revertedWith("Contrato pausado.");
     await expect(contrato.getVotos(1)).to.be.revertedWith("Contrato pausado.");
+    await expect(contrato.editNome(1,"string2")).to.be.revertedWith("Contrato pausado.");
+    await expect(contrato.editDescricao(1,"string2")).to.be.revertedWith("Contrato pausado.");
   });
   it("Verificando se usuário é eleitor ou não", async function () {
     const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);

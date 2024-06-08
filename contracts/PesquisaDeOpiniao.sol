@@ -28,7 +28,8 @@ contract PesquisaDeOpiniao is Ownable {
     address[] internal eleitores;
     mapping(address => bool) public mappingEleitores;
     mapping(uint256 => Votacao) public mappingVotacoes;
-    mapping(bytes32 => bool) public mappingJaVotou;
+    //mapping(bytes32 => bool) public mappingJaVotou;
+    mapping(uint256 => mapping(address => bool)) public mappingJaVotou;
     event VotacaoCadastrada(string nomeDaVotacao);
     event VotacaoEncerrada(uint256 idDaVotacao, string motivo);
     event anuncio(string indexed titulo, string info);
@@ -114,6 +115,16 @@ contract PesquisaDeOpiniao is Ownable {
         );
     }
 
+    function editNome(uint256 idDaVotacao, string calldata novoNome) external notPaused {
+        require(msg.sender == mappingVotacoes[idDaVotacao].criador,"Apenas o criador pode editar uma votacao");
+        mappingVotacoes[idDaVotacao].nome = novoNome;
+    }
+
+    function editDescricao(uint256 idDaVotacao, string calldata novaDescricao) external notPaused {
+        require(msg.sender == mappingVotacoes[idDaVotacao].criador,"Apenas o criador pode editar uma votacao");
+        mappingVotacoes[idDaVotacao].descricao = novaDescricao;
+    }
+
     function encerraVotacao(uint256 idDaVotacao, string calldata motivo) external notPaused() {
         require(msg.sender == mappingVotacoes[idDaVotacao].criador || msg.sender == owner(),"Apenas o criador da votacao ou o dono do contrato podem encerrar uma votacao");
         mappingVotacoes[idDaVotacao].status = false;
@@ -129,14 +140,12 @@ contract PesquisaDeOpiniao is Ownable {
     }
 
     function votar(uint256 idDaVotacao, uint256 opcaoDeVoto) external notPaused() isEleitor(msg.sender) {
-        bytes32 idDoVoto = keccak256(abi.encodePacked(idDaVotacao, msg.sender));
-
-        require(!mappingJaVotou[idDoVoto],"O eleitor ja votou nessa pesquisa");
+        require(!mappingJaVotou[idDaVotacao][msg.sender],"O eleitor ja votou nessa pesquisa");
         require(mappingVotacoes[idDaVotacao].opcoes.length > opcaoDeVoto, "Opcao de voto inexistente");
 
         mappingVotacoes[idDaVotacao].opcoes[opcaoDeVoto] += 1;
         mappingVotacoes[idDaVotacao].jaVotou.push(msg.sender);
-        mappingJaVotou[idDoVoto] = true;
+        mappingJaVotou[idDaVotacao][msg.sender] = true;
     }
 
     function getVotos(uint256 idDaVotacao) notPaused() isEleitor(msg.sender) external view returns (uint256[] memory) {

@@ -26,9 +26,9 @@ contract PesquisaDeOpiniao is Ownable {
     uint256 internal _id = 0;
     bool internal isPaused = false;
     address[] internal eleitores;
-    mapping(address => bool) public mappingEleitores;
-    mapping(uint256 => Votacao) public mappingVotacoes;
-    mapping(uint256 => mapping(address => bool)) public mappingJaVotou;
+    mapping(address => bool) internal mappingEleitores;
+    mapping(uint256 => Votacao) internal mappingVotacoes;
+    mapping(uint256 => mapping(address => bool)) internal mappingJaVotou;
     event VotacaoCadastrada(uint256 idDaVotacao, string nomeDaVotacao);
     event VotacaoEncerrada(uint256 idDaVotacao, string motivo);
     event anuncio(string indexed titulo, string info);

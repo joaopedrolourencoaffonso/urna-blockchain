@@ -28,7 +28,6 @@ contract PesquisaDeOpiniao is Ownable {
     address[] internal eleitores;
     mapping(address => bool) public mappingEleitores;
     mapping(uint256 => Votacao) public mappingVotacoes;
-    //mapping(bytes32 => bool) public mappingJaVotou;
     mapping(uint256 => mapping(address => bool)) public mappingJaVotou;
     event VotacaoCadastrada(uint256 idDaVotacao, string nomeDaVotacao);
     event VotacaoEncerrada(uint256 idDaVotacao, string motivo);
@@ -102,6 +101,8 @@ contract PesquisaDeOpiniao is Ownable {
         votacoes.push(_id);
         mappingVotacoes[_id] = novaVotacao;
 
+        emit VotacaoCadastrada(_id, _nome);
+
         return "Votacao cadastrada com sucesso";
     }
 
@@ -150,5 +151,9 @@ contract PesquisaDeOpiniao is Ownable {
 
     function getVotos(uint256 idDaVotacao) notPaused() isEleitor(msg.sender) external view returns (uint256[] memory) {
         return mappingVotacoes[idDaVotacao].opcoes;
+    }
+
+    function emitAnuncio(string calldata titulo, string calldata info) notPaused onlyOwner external {
+        emit anuncio(titulo, info);
     }
 }

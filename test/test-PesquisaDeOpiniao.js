@@ -227,6 +227,7 @@ describe("Testando contrato de votações", function () {
     await expect(contrato.getVotos(1)).to.be.revertedWith("Contrato pausado.");
     await expect(contrato.editNome(1,"string2")).to.be.revertedWith("Contrato pausado.");
     await expect(contrato.editDescricao(1,"string2")).to.be.revertedWith("Contrato pausado.");
+    await expect(contrato.emitAnuncio("string1","string2")).to.be.revertedWith("Contrato pausado.");
   });
   it("Verificando se usuário é eleitor ou não", async function () {
     const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);
@@ -236,6 +237,22 @@ describe("Testando contrato de votações", function () {
     await expect(contrato.connect(lista_de_eleitores[15]).votar(1,0)).to.be.revertedWith("Eleitor nao cadastrado.");
     await expect(contrato.connect(lista_de_eleitores[15]).quemJaVotou(1)).to.be.revertedWith("Eleitor nao cadastrado.");
     await expect(contrato.connect(lista_de_eleitores[15]).getVotos(1)).to.be.revertedWith("Eleitor nao cadastrado.");
+  });
+  it("Verificando emissão de eventos", async function () {
+    // Como já cadastra uma votação, um evento de criação de votação deveria ser emitido
+    const { contrato, lista_de_eleitores } = await loadFixture(votacaoCadastrada);
+
+    // evento de encerramento de votação deveria ser emitido
+    //approveTx = await contrato.encerraVotacao(1,"Teste");
+    await expect(contrato.encerraVotacao(1,"Teste")).to.emit(contrato, "VotacaoEncerrada").withArgs(1,"Teste");
+
+    // emitindo anuncio
+    await expect(contrato.emitAnuncio("Teste","Teste teste")).to.emit(contrato, "anuncio").withArgs("Teste","Teste teste");
+
+    // cadastrando nova votação
+    await expect(contrato.cadastrarVotacao("teste","teste",3)).to.emit(contrato, "VotacaoCadastrada").withArgs(2,"teste");
+
+    await expect(contrato.connect(lista_de_eleitores[1]).emitAnuncio("teste","teste")).to.be.reverted;
   });
 }); 
 });

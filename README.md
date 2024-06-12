@@ -2,94 +2,103 @@
 
 Um pequeno projeto para praticar conhecimentos de blockchain, smart contracts e web3.
 
-## [SimNaoVotos.sol](./SimNaoVotos.sol)
+O foco é a criação de um contrato para realizar votações em uma rede baseada no ethereum com as seguintes características
+
 - [X] Pausável
 - [X] Cadastrar eleitores
 - [X] Autenticar eleitor
-- [X] Cadastrar votações de "sim" ou "não"
-- [X] Votar nas votações de "sim" ou "não"
+- [X] Cadastrar votações com múltiplas opções
+- [X] Votar
 - [X] Verificar se voto é repetido
-- [X] Retornar resultado de votação
+- [X] Retornar detalhes de votação, incluindo número de votos, quem votou e status.
 - [X] Retornar lista de votações
-- [X] Retornar lista de eleitores que votaram em certa votação
-- [X] Retornar status e detalhes de uma certa votação
 - [X] Editar status e detalhes de uma certa votação
-- [X] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
 - [X] Testar 100% do contrato
-- [X] Otimizar uso de gas
+- [X] Uso de gas otimizado diante das condições acima
 
 ## Como usar
 
-1. Crie um projeto Hardhat normalmente
-2. Salve o [`SimNaoVotos.sol`](./SimNaoVotos.sol) na sua pasta `contracts`.
-3. Salve o [`interact-voting.js`](./interact-voting.js) na sua pasta `scripts`.
-4. Salve o [`test-SimNaoVotos.js`](./test-SimNaoVotos.js) na sua pasta `test`.
+1. Clone o presente repositório:
 
-Pronto, basta usar os comandos `npx hardhat coverage` para executar os testes e observar a cobertura.
+```bash
+$ git clone https://github.com/joaopedrolourencoaffonso/urna-blockchain.git
+```
+2. Instale as dependências:
+
+```bash
+$ npm install
+```
+
+3. Na pasta scripts você irá encontrar:
+
+ - [`deploy-PesquisaDeOpiniao.js`](./scripts/deploy-PesquisaDeOpiniao.js): Script que realiza o deploy do contrato [`PesquisaDeOpiniao`](./contracts/PesquisaDeOpiniao.sol).
+ - [`provoca-eventos.js`](./scripts/provoca-eventos.js): Um exemplo de script capaz de provocar a emissão de eventos.
+ - [`get-eventos.js`](./scripts/get-eventos.js): Um exemplo de script capaz de retornar os eventos recebidos
+
+Os testes foram realizados com [`test-PesquisaDeOpiniao.js`](./test/test-PesquisaDeOpiniao.js), com cobertura de 100%. Para verificar, basta executar:
+
+```bash
+$ npx hardhat coverage
+```
 
 ### Preço da execução
 
 Usando o [hardhat-gas-reporter](https://www.npmjs.com/package/hardhat-gas-reporter), temos os seguintes preços de execução. 
 
 ```bash
-····················································································································
-|  Solidity and Network Configuration                                                                              │
-·······························|·················|···············|·················|································
-|  Solidity: 0.8.24            ·  Optim: false   ·  Runs: 200    ·  viaIR: false   ·     Block: 30,000,000 gas     │
-·······························|·················|···············|·················|································
-|  Methods                                                                                                         │
-·······························|·················|···············|·················|················|···············
-|  Contracts / Methods         ·  Min            ·  Max          ·  Avg            ·  # calls       ·  usd (avg)   │
-·······························|·················|···············|·················|················|···············
-|  SimNaoVotos                 ·                                                                                   │
-·······························|·················|···············|·················|················|···············
-|      adicionaEleitor         ·         76,387  ·       93,499  ·         79,578  ·            43  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      cadastrarVotacao        ·        130,030  ·      147,226  ·        139,433  ·            11  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      editaDetalhesDeVotacao  ·              -  ·            -  ·         36,033  ·             1  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      editaStatusDeVotacao    ·              -  ·            -  ·         33,846  ·             1  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      excluiEleitor           ·              -  ·            -  ·         41,801  ·             1  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      pause                   ·              -  ·            -  ·         45,772  ·             9  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      unpause                 ·              -  ·            -  ·         23,762  ·             1  ·           -  │
-·······························|·················|···············|·················|················|···············
-|      votar                   ·         76,770  ·      106,844  ·         88,717  ·            23  ·           -  │
-·······························|·················|···············|·················|················|···············
-|  Deployments                                   ·                                 ·  % of limit    ·              │
-·······························|·················|···············|·················|················|···············
-|  SimNaoVotos                 ·              -  ·            -  ·      3,058,502  ·        10.2 %  ·           -  │
-·······························|·················|···············|·················|················|···············
-|  Key                                                                                                             │
-····················································································································
-|  ◯  Execution gas for this method does not include intrinsic gas overhead                                        │
-····················································································································
-|  △  Cost was non-zero but below the precision setting for the currency display (see options)                     │
-····················································································································
-|  Toolchain:  hardhat                                                                                             │
-····················································································································
+··············································································································
+|  Solidity and Network Configuration                                                                        │      
+·························|·················|···············|·················|································      
+|  Solidity: 0.8.24      ·  Optim: false   ·  Runs: 200    ·  viaIR: false   ·     Block: 30,000,000 gas     │      
+·························|·················|···············|·················|································      
+|  Methods                                                                                                   │      
+·························|·················|···············|·················|················|···············      
+|  Contracts / Methods   ·  Min            ·  Max          ·  Avg            ·  # calls       ·  usd (avg)   │      
+·························|·················|···············|·················|················|···············      
+|  PesquisaDeOpiniao     ·                                                                                   │      
+·························|·················|···············|·················|················|···············      
+|      adicionaEleitor   ·         76,100  ·       93,212  ·         78,810  ·            19  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      cadastrarVotacao  ·        185,806  ·      220,210  ·        191,588  ·            12  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      editDescricao     ·              -  ·            -  ·         32,639  ·             2  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      editNome          ·              -  ·            -  ·         32,573  ·             2  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      emitAnuncio       ·              -  ·            -  ·         29,877  ·             2  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      encerraVotacao    ·         32,349  ·       34,542  ·         33,080  ·             6  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      excluiEleitor     ·              -  ·            -  ·         41,721  ·             2  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      pause             ·              -  ·            -  ·         45,728  ·             4  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      unpause           ·              -  ·            -  ·         23,807  ·             1  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|      votar             ·        101,229  ·      118,317  ·        106,925  ·             6  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|  Deployments                             ·                                 ·  % of limit    ·              │      
+·························|·················|···············|·················|················|···············      
+|  PesquisaDeOpiniao     ·              -  ·            -  ·      2,948,002  ·         9.8 %  ·           -  │      
+·························|·················|···············|·················|················|···············      
+|  Key                                                                                                       │      
+··············································································································      
+|  ◯  Execution gas for this method does not include intrinsic gas overhead                                  │      
+··············································································································      
+|  △  Cost was non-zero but below the precision setting for the currency display (see options)               │      
+··············································································································      
+|  Toolchain:  hardhat                                                                                       │      
+·············································································································· 
 ```
 
-Por comparação, na rede **Ethereum**, com o preço atual (18/05/2024) de [15,878 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 13 reais para executar a função `cadastrarVotacao` e  291,35 reais para implementar na rede Ethereum. A função `votar`, que deveria ser a mais utilizada, deveria custar em torno R$ 8,45 reais.
+Por comparação, na rede **Ethereum**, com o preço atual (12/06/2024) de [19,289 reais](https://www.google.com/search?client=firefox-b-d&q=ether+price) por ether e de [6 gwei](https://etherscan.io/gastracker) por gas, custaria em torno de 22,16 reais para executar a função `cadastrarVotacao` e  341,18 reais para implementar na rede Ethereum. A função `votar`, que deveria ser a mais utilizada, deveria custar em torno R$ 12,37 reais.
 
+## Interface Web 
 
-## [MultiplaEscolha.sol](MultiplaEscolha.sol)
-- [ ] Cadastrar votações com múltiplas opções (além do "sim" ou "não")
-- [ ] Votar nas votações com múltiplas opções
-- [ ] Verificar se voto é repetido
-- [ ] Retornar resultado de votação
-- [ ] Retornar lista de votações
-- [ ] Retornar lista de eleitores que votaram em certa votação
-- [ ] Retornar status e detalhes de uma certa votação
-- [ ] Editar status e detalhes de uma certa votação
-- [ ] Contrato encerra votação automáticamente quando mais de 50% dos eleitores já votaram
-- [ ] Testar 100% do contrato
-- [ ] Otimizar uso de gas
+Em desenvolvimento
 
-## Interface Web
-
-Futuro Desenvolvimento.
+- [ ] Eventos emitidos devem ficar disponíveis para qualquer usuário que acesse a página
+- [ ] Eleitor deve ser capaz de conectar a carteira e cadastrar uma votação
+- [ ] Eleitor deve ser capaz de conectar a carteira e visualizar votações ativas e inativas
+- [ ] Eleitor deve ser capaz de conectar a carteira e realizar o voto
 
